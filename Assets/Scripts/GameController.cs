@@ -1,8 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameController : MonoBehaviour
+public class GameController : MonoBehaviour, AStar.Level
 {
     [SerializeField]
     private MazeGenerator mazeGenerator;
@@ -16,6 +17,8 @@ public class GameController : MonoBehaviour
     private int[,] maze;
 
     private PlayerController playerObj;
+
+    public bool allowDiagonalMove = true;
 
     private void Start()
     {
@@ -36,8 +39,8 @@ public class GameController : MonoBehaviour
         (int, int) randomPos;
         do
         {
-            int randomX = Random.Range(0, maze.GetLength(0));
-            int randomY = Random.Range(0, maze.GetLength(1));
+            int randomX = UnityEngine.Random.Range(0, maze.GetLength(0));
+            int randomY = UnityEngine.Random.Range(0, maze.GetLength(1));
             randomPos = (randomX, randomY);
         } while (!MazeGenerator.IsFree(maze, randomPos));
 
@@ -50,7 +53,7 @@ public class GameController : MonoBehaviour
         // 1 - Convert 3D coordinates to Maze coordinates => finalMazePos
         (int, int) finalMazePos = From3DMaze(final3DPos);
         // 2 - Apply Dijkstra to find the path between playerPos and finalMazePos
-        List<(int, int)> shortestPath = AStar.Apply(maze, From3DMaze(playerObj.transform.position), finalMazePos);
+        List<(int, int)> shortestPath = AStar.Apply(this, From3DMaze(playerObj.transform.position), finalMazePos, allowDiagonalMove);
         // 3 - Ask the player to follow this path
         playerObj.Move(FromMazeTo3D(shortestPath));
     }
@@ -91,4 +94,22 @@ public class GameController : MonoBehaviour
         return ret;
     }
 
+    public bool IsFree((int x, int y) pos)
+    {
+        return MazeGenerator.IsFree(maze, pos);
+    }
+
+    public double Cost((int x, int y) from, (int x, int y) to)
+    {
+        int dx = to.x - from.x;
+        int dy = to.y - from.y;
+        return Math.Sqrt(dx * dx + dy * dy);
+    }
+
+    public double Heuristic((int x, int y) from, (int x, int y) to)
+    {
+        int dx = to.x - from.x;
+        int dy = to.y - from.y;
+        return Math.Sqrt(dx * dx + dy * dy) / 2.0d;
+    }
 }
