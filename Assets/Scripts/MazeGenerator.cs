@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class Oskour : MonoBehaviour
+public class MazeGenerator : MonoBehaviour
 {
-    private const int CELL_TYPE_WALL = 0;
+    public const int CELL_TYPE_WALL = 0;
     private const int CELL_TYPE_TO_EXPLORE = 1;
     private const int CELL_TYPE_EXPLORED = 2;
     public const int CELL_TYPE_ROOM = 3;
@@ -17,8 +17,6 @@ public class Oskour : MonoBehaviour
     private int gridHeight = 5;
 
     [Header("Rooms")]
-
-    public GameObject wallPrefab;
 
     [SerializeField]
     private int nbRooms = 2;
@@ -35,35 +33,28 @@ public class Oskour : MonoBehaviour
     [SerializeField]
     private int maxRoomY = 3;
 
-    // Start is called before the first frame update
-    void Start()
+    public int[,] CreateMaze()
     {
         int[,] maze = InitMaze(gridWidth, gridHeight);
         (int, int) randomCell = GetRandomStartingPoint(gridWidth, gridHeight);
         CreateMaze(maze, randomCell);
         MakeRoom(maze);
         DisplayMazeInConsole(maze);
-        MazeIn3D(maze, wallPrefab);
+
+        return maze;
     }
 
-    private void MazeIn3D(int[,] maze, GameObject prefab)
+    public static bool IsFree(int[,] maze, (int x, int y) pos)
     {
-        for (int y = 0; y < maze.GetLength(1); y++)
-        {
-            for (int x = 0; x < maze.GetLength(0); x++)
-            {
-                if (maze[x, y] == CELL_TYPE_WALL)
-                {
-                    Vector3 position = FromMazeTo3D((x, y));
-                    GameObject.Instantiate(prefab, position, Quaternion.identity);
-                }
-            }
-        }
-    }
-
-    private Vector3 FromMazeTo3D((int x, int y) p)
-    {
-        return new Vector3(p.x + 0.5f, 0.5f, -p.y - 0.5f);
+        if (pos.x < 0)
+            return false;
+        if (pos.x >= maze.GetLength(0))
+            return false;
+        if (pos.y < 0)
+            return false;
+        if (pos.y >= maze.GetLength(1))
+            return false;
+        return maze[pos.x, pos.y] != CELL_TYPE_WALL;
     }
 
     private void MakeRoom(int[,] maze)
