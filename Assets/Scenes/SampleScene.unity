@@ -474,6 +474,9 @@ MonoBehaviour:
     type: 3}
   playerController: {fileID: -5102662368011826838, guid: e89c9c7e3170d0b4abc8b6deea42e329,
     type: 3}
+  collectibleGameObject: {fileID: 8729038527966622852, guid: a2e14ca3ae3859e46aab825367df1b7e,
+    type: 3}
+  allowDiagonalMove: 0
 --- !u!4 &2005405666
 Transform:
   m_ObjectHideFlags: 0

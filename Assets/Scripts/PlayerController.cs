@@ -34,10 +34,19 @@ public class PlayerController : MonoBehaviour
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
+
+            Vector3 temp = new Vector3(transform.position.x, ray.origin.y, transform.position.z);
+
+            Debug.Log(ray.origin.x - transform.position.x);
+            
             if (Physics.Raycast(ray, out hit, maxRaycastDistance, layerMaskForSolid))
             {
                 //Debug.Log("Raycasting : " + hit.point + " on " + hit.collider.gameObject.tag);
-                if (groundTag == hit.collider.gameObject.tag)
+
+                float distance = Distance(transform.position.x, ray.origin.x, transform.position.z, ray.origin.z);
+                Debug.Log(distance);
+
+                if (groundTag == hit.collider.gameObject.tag && distance <= 5f)
                 {
                     gameController.MovePlayer(hit.point);
                 }
@@ -55,6 +64,7 @@ public class PlayerController : MonoBehaviour
                 moving = false;
             }
         }
+
         if (!moving && otherPointsInPath.Count > 0)
         {
             nextPointInPath = otherPointsInPath[0];
@@ -74,5 +84,26 @@ public class PlayerController : MonoBehaviour
     {
         otherPointsInPath.Clear();
         otherPointsInPath.AddRange(newPath);
+    }
+
+    private void OnTriggerEnter(Collider collide)
+    {
+        if (collide.gameObject.tag == "Collectible")
+        {
+            Destroy(collide.gameObject);
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.blue;
+        Gizmos.DrawSphere(transform.position, 5f);
+    }
+
+    private float Distance(float xPlayer, float xClick, float yPlayer, float yClick)
+    {
+        float distance;
+
+        return distance = Mathf.Sqrt(Mathf.Pow(xClick - xPlayer, 2) + Mathf.Pow(yClick - yPlayer, 2));
     }
 }

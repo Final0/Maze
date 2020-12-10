@@ -39,7 +39,7 @@ public class MazeGenerator : MonoBehaviour
         (int, int) randomCell = GetRandomStartingPoint(gridWidth, gridHeight);
         CreateMaze(maze, randomCell);
         MakeRoom(maze);
-        DisplayMazeInConsole(maze);
+        //DisplayMazeInConsole(maze);
 
         return maze;
     }

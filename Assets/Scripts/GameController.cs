@@ -14,6 +14,9 @@ public class GameController : MonoBehaviour, AStar.Level
     [SerializeField]
     private PlayerController playerController;
 
+    [SerializeField]
+    private GameObject collectibleGameObject;
+
     private int[,] maze;
 
     private PlayerController playerObj;
@@ -27,12 +30,43 @@ public class GameController : MonoBehaviour, AStar.Level
 
         (int, int) randomPos = SpawnPlayerAtPos(playerController);
         playerObj = CreatePlayer(randomPos, playerController);
+
+        SpawningCollectibles();
     }
+
+    #region Create Collectibles
+    private void SpawningCollectibles()
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            (int, int) randomCollectiblePos = SpawnCollectibleAtPos(collectibleGameObject);
+            CreateCollectible(randomCollectiblePos, collectibleGameObject);
+        }
+    }
+
+    private GameObject CreateCollectible((int, int) randomPos, GameObject collectible)
+    {
+        return Instantiate(collectible, FromMazeTo3D(randomPos), Quaternion.identity);
+    }
+
+    private (int, int) SpawnCollectibleAtPos(GameObject collectible)
+    {
+        (int, int) randomPos;
+        do
+        {
+            int randomX = UnityEngine.Random.Range(0, maze.GetLength(0));
+            int randomY = UnityEngine.Random.Range(0, maze.GetLength(1));
+            randomPos = (randomX, randomY);
+        } while (!MazeGenerator.IsFree(maze, randomPos));
+
+        return randomPos;
+    }
+    #endregion
 
     private PlayerController CreatePlayer((int, int) randomPos, PlayerController playerController)
     {
         return GameObject.Instantiate(playerController, FromMazeTo3D(randomPos), Quaternion.identity);
-    }
+    }   
 
     private (int, int) SpawnPlayerAtPos(PlayerController playerController)
     {
@@ -46,10 +80,10 @@ public class GameController : MonoBehaviour, AStar.Level
 
         return randomPos;
     }
-
+    
     public void MovePlayer(Vector3 final3DPos)
     {
-        Debug.Log("Moving to " + final3DPos);
+        //Debug.Log("Moving to " + final3DPos);
         // 1 - Convert 3D coordinates to Maze coordinates => finalMazePos
         (int, int) finalMazePos = From3DMaze(final3DPos);
         // 2 - Apply Dijkstra to find the path between playerPos and finalMazePos
@@ -84,6 +118,7 @@ public class GameController : MonoBehaviour, AStar.Level
         int y = -(int)coordinates3d.z;
         return (x, y);
     }
+
     private static List<Vector3> FromMazeTo3D(List<(int, int)> path)
     {
         List<Vector3> ret = new List<Vector3>();
