@@ -6,7 +6,11 @@ TagManager:
   tags:
   - Ground
   - Wall
+  - Bonus
+  - Treasure
   - Collectible
+  - SpeedText
+  - VisionText
   layers:
   - Default
   - TransparentFX

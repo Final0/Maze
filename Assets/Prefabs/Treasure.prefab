@@ -14,8 +14,8 @@ GameObject:
   - component: {fileID: 6497658145544051345}
   - component: {fileID: -3119647007211665517}
   m_Layer: 0
-  m_Name: Collectible
-  m_TagString: Collectible
+  m_Name: Treasure
+  m_TagString: Treasure
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

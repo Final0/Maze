@@ -15,7 +15,10 @@ public class GameController : MonoBehaviour, AStar.Level
     private PlayerController playerController;
 
     [SerializeField]
-    private GameObject collectibleGameObject;
+    private GameObject treasureGameObject;
+
+    [SerializeField]
+    private GameObject bonusGameObject;
 
     private int[,] maze;
 
@@ -34,22 +37,28 @@ public class GameController : MonoBehaviour, AStar.Level
         SpawningCollectibles();
     }
 
-    #region Create Collectibles
+    #region Spawning Collectibles (Treasures & Bonus)
     private void SpawningCollectibles()
     {
         for (int i = 0; i < 4; i++)
         {
-            (int, int) randomCollectiblePos = SpawnCollectibleAtPos(collectibleGameObject);
-            CreateCollectible(randomCollectiblePos, collectibleGameObject);
+            (int, int) randomTreasurePos = randomCollectible(treasureGameObject);
+            SpawnCollectible(randomTreasurePos, treasureGameObject);
+        }
+
+        for (int i = 0; i < 40; i++)
+        {
+            (int, int) randomBonusPos = randomCollectible(bonusGameObject);
+            SpawnCollectible(randomBonusPos, bonusGameObject);
         }
     }
 
-    private GameObject CreateCollectible((int, int) randomPos, GameObject collectible)
+    private GameObject SpawnCollectible((int, int) randomPos, GameObject collectible)
     {
         return Instantiate(collectible, FromMazeTo3D(randomPos), Quaternion.identity);
     }
 
-    private (int, int) SpawnCollectibleAtPos(GameObject collectible)
+    private (int, int) randomCollectible(GameObject collectible)
     {
         (int, int) randomPos;
         do

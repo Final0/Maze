@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -14,9 +16,12 @@ public class PlayerController : MonoBehaviour
 
     private GameController gameController;
 
+    private float distanceToMove = 5f;
+
     private void Awake()
     {
         var gc = GameObject.FindWithTag("GameController");
+
         if (null == gc)
         {
             Debug.LogError("[PlayerController] GameController missing");
@@ -24,6 +29,20 @@ public class PlayerController : MonoBehaviour
         else
         {
             gameController = gc.GetComponent<GameController>();
+        }
+
+        var sTT = GameObject.FindGameObjectWithTag("SpeedText");
+
+        if(sTT != null)
+        {
+            speedTimerText = sTT.GetComponent<Text>();
+        }
+
+        var vTT = GameObject.FindGameObjectWithTag("VisionText");
+
+        if (vTT != null)
+        {
+            visionTimerText = vTT.GetComponent<Text>();
         }
     }
 
@@ -34,19 +53,12 @@ public class PlayerController : MonoBehaviour
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
-
-            Vector3 temp = new Vector3(transform.position.x, ray.origin.y, transform.position.z);
-
-            Debug.Log(ray.origin.x - transform.position.x);
             
             if (Physics.Raycast(ray, out hit, maxRaycastDistance, layerMaskForSolid))
             {
-                //Debug.Log("Raycasting : " + hit.point + " on " + hit.collider.gameObject.tag);
-
                 float distance = Distance(transform.position.x, ray.origin.x, transform.position.z, ray.origin.z);
-                Debug.Log(distance);
 
-                if (groundTag == hit.collider.gameObject.tag && distance <= 5f)
+                if (groundTag == hit.collider.gameObject.tag && distance <= distanceToMove)
                 {
                     gameController.MovePlayer(hit.point);
                 }
@@ -71,6 +83,18 @@ public class PlayerController : MonoBehaviour
             otherPointsInPath.RemoveAt(0);
             moving = true;
         }
+
+        if (isSpeedBonus)
+        {
+            speedTimer -= Time.deltaTime;
+            speedTimerText.text = speedTimer.ToString("0");
+        }  
+        
+        if (isVisionBonus)
+        {
+            visionTimer -= Time.deltaTime;
+            visionTimerText.text = visionTimer.ToString("0");
+        }   
     }
 
     [SerializeField]
@@ -88,17 +112,93 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter(Collider collide)
     {
-        if (collide.gameObject.tag == "Collectible")
+        if (collide.gameObject.tag == "Treasure")
         {
             Destroy(collide.gameObject);
         }
+
+        if (collide.gameObject.tag == "Bonus")
+        {
+            Destroy(collide.gameObject);
+            RandomBonus();
+        }
     }
 
-    private void OnDrawGizmos()
+    #region Bonus
+    private void RandomBonus()
     {
-        Gizmos.color = Color.blue;
-        Gizmos.DrawSphere(transform.position, 5f);
+        int randomNumber = UnityEngine.Random.Range(0, 3);
+
+        switch (randomNumber)
+        {
+            case 0:
+                VisionBonus();
+                break;
+            case 1:
+                VisionBonus();
+                break;
+            case 2:
+                VisionBonus();
+                break;
+        }
     }
+
+    #region Speed Bonus
+    bool isSpeedBonus = false;
+    float speedTimer = 10f;
+    public Text speedTimerText;
+
+    private void SpeedBonus()
+    {
+        CancelInvoke("ReturnToBasicSpeed");
+
+        isSpeedBonus = true;
+        speedTimer = 10f;
+        moveSpeed = 12f;
+
+        Invoke("ReturnToBasicSpeed", 10f);
+    }
+
+    private void ReturnToBasicSpeed()
+    {
+        isSpeedBonus = false;
+        speedTimer = 10f;
+        moveSpeed = 8f;
+        speedTimerText.text = "No Speed Bonus in use";
+    }
+    #endregion
+
+    #region Vision Bonus
+    bool isVisionBonus = false;
+    float visionTimer = 10f;
+    public Text visionTimerText;
+
+    private void VisionBonus()
+    {
+        CancelInvoke("ReturnToBasicVision");
+
+        isVisionBonus = true;
+        visionTimer = 10f;
+        //TODO : Récupérer dans le start light et modifier ici son rayon
+
+        Invoke("ReturnToBasicVision", 10f);
+    }
+
+    private void ReturnToBasicVision()
+    {
+        isVisionBonus = false;
+        visionTimer = 10f;
+        //TODO : annuler les effets d'au dessus
+        visionTimerText.text = "No Vision Bonus in use";
+    }
+    #endregion
+
+
+    private void TimeBonus()
+    {
+        throw new NotImplementedException();
+    }
+    #endregion
 
     private float Distance(float xPlayer, float xClick, float yPlayer, float yClick)
     {

@@ -289,3 +289,5 @@ MonoBehaviour:
     m_Bits: 256
   groundTag: Ground
   moveSpeed: 8
+  speedTimerText: {fileID: 0}
+  visionTimerText: {fileID: 0}
