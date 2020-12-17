@@ -38,15 +38,18 @@ public class GameController : MonoBehaviour, AStar.Level
     }
 
     #region Spawning Collectibles (Treasures & Bonus)
+    private const int NUMBER_TREASURE = 6;
+    private const int NUMBER_BONUS = 8;
+
     private void SpawningCollectibles()
     {
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < NUMBER_TREASURE; i++)
         {
             (int, int) randomTreasurePos = randomCollectible(treasureGameObject);
             SpawnCollectible(randomTreasurePos, treasureGameObject);
         }
 
-        for (int i = 0; i < 40; i++)
+        for (int i = 0; i < NUMBER_BONUS; i++)
         {
             (int, int) randomBonusPos = randomCollectible(bonusGameObject);
             SpawnCollectible(randomBonusPos, bonusGameObject);

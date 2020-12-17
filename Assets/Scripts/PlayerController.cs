@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
     private GameController gameController;
     private Light gameLight;
     private GameTimer gameTimer;
+    private BonusUI bonusUI;
 
     private float distanceToMove = 5f;
 
@@ -33,23 +34,10 @@ public class PlayerController : MonoBehaviour
             gameController = gc.GetComponent<GameController>();
         }
 
-        var sTT = GameObject.FindGameObjectWithTag("SpeedText");
-
-        if(sTT != null)
-        {
-            speedTimerText = sTT.GetComponent<Text>();
-        }
-
-        var vTT = GameObject.FindGameObjectWithTag("VisionText");
-
-        if (vTT != null)
-        {
-            visionTimerText = vTT.GetComponent<Text>();
-        }
-
         gameLight = GetComponentInChildren<Light>();
 
         gameTimer = FindObjectOfType<GameTimer>();
+        bonusUI = FindObjectOfType<BonusUI>();
     }
 
     void Update()
@@ -91,16 +79,10 @@ public class PlayerController : MonoBehaviour
         }
 
         if (isSpeedBonus)
-        {
-            speedTimer -= Time.deltaTime;
-            speedTimerText.text = speedTimer.ToString("0");
-        }  
+            speedTimer -= Time.deltaTime; 
         
         if (isVisionBonus)
-        {
             visionTimer -= Time.deltaTime;
-            visionTimerText.text = visionTimer.ToString("0");
-        }   
     }
 
     [SerializeField]
@@ -150,9 +132,8 @@ public class PlayerController : MonoBehaviour
     }
 
     #region Speed Bonus
-    bool isSpeedBonus = false;
+    public bool isSpeedBonus = false;
     float speedTimer = 10f;
-    public Text speedTimerText;
 
     private const float MOVE_SPEED_BONUS = 12f;
     private const float MOVE_SPEED_BASIC = 8f;
@@ -165,6 +146,8 @@ public class PlayerController : MonoBehaviour
         speedTimer = 10f;
         moveSpeed = MOVE_SPEED_BONUS;
 
+        bonusUI.bonusSpeedIcon.fillAmount = 1f;
+
         Invoke("ReturnToBasicSpeed", speedTimer);
     }
 
@@ -173,14 +156,12 @@ public class PlayerController : MonoBehaviour
         isSpeedBonus = false;
         speedTimer = 10f;
         moveSpeed = MOVE_SPEED_BASIC;
-        speedTimerText.text = "No Speed Bonus in use";
     }
     #endregion
 
     #region Vision Bonus
-    bool isVisionBonus = false;
+    public bool isVisionBonus = false;
     float visionTimer = 10f;
-    public Text visionTimerText;
 
     private const float LIGHT_VISION_BONUS = 78 * 1.5f;
     private const float LIGHT_VISION_BASIC = 78f;
@@ -198,6 +179,8 @@ public class PlayerController : MonoBehaviour
         gameLight.spotAngle = LIGHT_VISION_BONUS;
         distanceToMove = DISTANCE_MOVE_BONUS;
 
+        bonusUI.bonusVisionIcon.fillAmount = 1f;
+
         Invoke("ReturnToBasicVision", visionTimer);
     }
 
@@ -208,8 +191,6 @@ public class PlayerController : MonoBehaviour
 
         gameLight.spotAngle = LIGHT_VISION_BASIC;
         distanceToMove = DISTANCE_MOVE_BASIC;
-
-        visionTimerText.text = "No Vision Bonus in use";
     }
     #endregion
 
