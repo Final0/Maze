@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour
     private Light gameLight;
     private GameTimer gameTimer;
     private BonusUI bonusUI;
+    private AudioPlay audioPlay;
 
     private float distanceToMove = 5f;
 
@@ -38,6 +39,7 @@ public class PlayerController : MonoBehaviour
 
         gameTimer = FindObjectOfType<GameTimer>();
         bonusUI = FindObjectOfType<BonusUI>();
+        audioPlay = FindObjectOfType<AudioPlay>();
     }
 
     void Update()
@@ -109,12 +111,14 @@ public class PlayerController : MonoBehaviour
         {
             Destroy(collide.gameObject);
             treasureLeft--;
+            audioPlay.treasureAudioPlay();
         }
 
         if (collide.gameObject.tag == "Bonus")
         {
             Destroy(collide.gameObject);
             RandomBonus();
+            audioPlay.bonusAudioPlay();
         }
     }
 
