@@ -15,6 +15,8 @@ public class PlayerController : MonoBehaviour
     private string groundTag;
 
     private GameController gameController;
+    private Light gameLight;
+    private GameTimer gameTimer;
 
     private float distanceToMove = 5f;
 
@@ -44,6 +46,10 @@ public class PlayerController : MonoBehaviour
         {
             visionTimerText = vTT.GetComponent<Text>();
         }
+
+        gameLight = GetComponentInChildren<Light>();
+
+        gameTimer = FindObjectOfType<GameTimer>();
     }
 
     void Update()
@@ -132,13 +138,13 @@ public class PlayerController : MonoBehaviour
         switch (randomNumber)
         {
             case 0:
-                VisionBonus();
+                SpeedBonus();
                 break;
             case 1:
                 VisionBonus();
                 break;
             case 2:
-                VisionBonus();
+                TimeBonus();
                 break;
         }
     }
@@ -148,22 +154,25 @@ public class PlayerController : MonoBehaviour
     float speedTimer = 10f;
     public Text speedTimerText;
 
+    private const float MOVE_SPEED_BONUS = 12f;
+    private const float MOVE_SPEED_BASIC = 8f;
+
     private void SpeedBonus()
     {
         CancelInvoke("ReturnToBasicSpeed");
 
         isSpeedBonus = true;
         speedTimer = 10f;
-        moveSpeed = 12f;
+        moveSpeed = MOVE_SPEED_BONUS;
 
-        Invoke("ReturnToBasicSpeed", 10f);
+        Invoke("ReturnToBasicSpeed", speedTimer);
     }
 
     private void ReturnToBasicSpeed()
     {
         isSpeedBonus = false;
         speedTimer = 10f;
-        moveSpeed = 8f;
+        moveSpeed = MOVE_SPEED_BASIC;
         speedTimerText.text = "No Speed Bonus in use";
     }
     #endregion
@@ -173,30 +182,40 @@ public class PlayerController : MonoBehaviour
     float visionTimer = 10f;
     public Text visionTimerText;
 
+    private const float LIGHT_VISION_BONUS = 78 * 1.5f;
+    private const float LIGHT_VISION_BASIC = 78f;
+
+    private const float DISTANCE_MOVE_BONUS = 5 * 1.5f;
+    private const float DISTANCE_MOVE_BASIC = 5;
+
     private void VisionBonus()
     {
         CancelInvoke("ReturnToBasicVision");
 
         isVisionBonus = true;
         visionTimer = 10f;
-        //TODO : Récupérer dans le start light et modifier ici son rayon
 
-        Invoke("ReturnToBasicVision", 10f);
+        gameLight.spotAngle = LIGHT_VISION_BONUS;
+        distanceToMove = DISTANCE_MOVE_BONUS;
+
+        Invoke("ReturnToBasicVision", visionTimer);
     }
 
     private void ReturnToBasicVision()
     {
         isVisionBonus = false;
         visionTimer = 10f;
-        //TODO : annuler les effets d'au dessus
+
+        gameLight.spotAngle = LIGHT_VISION_BASIC;
+        distanceToMove = DISTANCE_MOVE_BASIC;
+
         visionTimerText.text = "No Vision Bonus in use";
     }
     #endregion
 
-
     private void TimeBonus()
     {
-        throw new NotImplementedException();
+        gameTimer.inGameTime += 15f;
     }
     #endregion
 
