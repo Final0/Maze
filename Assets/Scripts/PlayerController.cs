@@ -59,7 +59,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        if (moving)
+        if (moving && gameTimer.isGameActive)
         {
             if (transform.position != nextPointInPath)
             {
@@ -94,15 +94,21 @@ public class PlayerController : MonoBehaviour
 
     public void Move(List<Vector3> newPath)
     {
-        otherPointsInPath.Clear();
-        otherPointsInPath.AddRange(newPath);
+        if (gameTimer.isGameActive)
+        {
+            otherPointsInPath.Clear();
+            otherPointsInPath.AddRange(newPath);
+        }
     }
+
+    public int treasureLeft = 6;
 
     private void OnTriggerEnter(Collider collide)
     {
         if (collide.gameObject.tag == "Treasure")
         {
             Destroy(collide.gameObject);
+            treasureLeft--;
         }
 
         if (collide.gameObject.tag == "Bonus")

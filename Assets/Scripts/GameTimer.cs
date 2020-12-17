@@ -5,18 +5,19 @@ using UnityEngine.UI;
 
 public class GameTimer : MonoBehaviour
 {
-    private Text textTimer;
+    public Text textTimer;
+    public GameObject gameHUD;
+
     public float inGameTime = 60 * 3;
 
-    private void Awake()
-    {
-        textTimer = GetComponent<Text>();
-    }
+    public bool isGameActive;
 
     private void Update()
     {
-        if (inGameTime > 0)
+        if (inGameTime > 1 && gameHUD.activeSelf)
         {
+            isGameActive = true;
+
             inGameTime -= Time.deltaTime;
 
             float minutes = Mathf.FloorToInt(inGameTime / 60);
@@ -24,9 +25,9 @@ public class GameTimer : MonoBehaviour
 
             textTimer.text = string.Format("{0:0}:{1:00}", minutes, seconds);
         }
-        else
+        else if (inGameTime <= 1)
         {
-
+            isGameActive = false;
         }
     }
 }
